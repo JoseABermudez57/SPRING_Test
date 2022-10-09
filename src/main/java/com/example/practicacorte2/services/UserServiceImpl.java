@@ -1,11 +1,13 @@
 package com.example.practicacorte2.services;
 
 import com.example.practicacorte2.controllers.dtos.requests.GetUserRequest;
+import com.example.practicacorte2.controllers.dtos.responses.BaseResponse;
 import com.example.practicacorte2.controllers.dtos.responses.GetUserResponse;
 import com.example.practicacorte2.entities.User;
 import com.example.practicacorte2.repositories.IUserRepository;
 import com.example.practicacorte2.services.interfaces.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,10 +19,17 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private IUserRepository repository;
 
-    @Override
-    public GetUserResponse create(GetUserRequest request) {
+    @Override // Modificar el retorno a un BaseResponse
+    public BaseResponse create(GetUserRequest request) {
         User save = repository.save(from(request));
-        return from(save);
+
+        // Aquí cae cuando las cosas salen bien
+        // Se devuelve el BaseResponse con información más detallada
+        return BaseResponse.builder()
+                .data(from(save))
+                .message("User created correctly")
+                .success(Boolean.TRUE)
+                .httStatus(HttpStatus.CREATED).build();
     }
 
     @Override

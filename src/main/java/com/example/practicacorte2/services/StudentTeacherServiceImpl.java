@@ -1,5 +1,6 @@
 package com.example.practicacorte2.services;
 
+import com.example.practicacorte2.controllers.dtos.responses.BaseResponse;
 import com.example.practicacorte2.controllers.dtos.responses.StudenResponse;
 import com.example.practicacorte2.controllers.dtos.responses.TeacherResponse;
 import com.example.practicacorte2.entities.projections.StudentProjection;
@@ -7,6 +8,7 @@ import com.example.practicacorte2.entities.projections.TeacherProjection;
 import com.example.practicacorte2.repositories.IStudentTeacherRepository;
 import com.example.practicacorte2.services.interfaces.IStudentTeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,13 +21,21 @@ public class StudentTeacherServiceImpl implements IStudentTeacherService {
     private IStudentTeacherRepository repository;
 
     @Override
-    public List<StudenResponse> listAllStudentsByTeacherId(Long teacherId) {
+    public BaseResponse listAllStudentsByTeacherId(Long teacherId) {
         /* por toda la lista de estudiantes y luego por cada estudiante crea un StudentResponse
            Y posterior a eso, cada response que se crea lo guarda nuevamente en una lista
            En este caso de StudenResponse
          */
         List<StudentProjection> students = repository.listAllStudentsByTeacherId(teacherId);
-        return students.stream().map(this::from).collect(Collectors.toList());
+
+        List<StudenResponse> response = students.stream()
+                .map(this::from)
+                .collect(Collectors.toList());
+        return BaseResponse.builder()
+                .data(response) // En response se encuentra la lista de respuesta de los datos encontrados
+                .message("Student list by teacher id")
+                .success(Boolean.TRUE)
+                .httStatus(HttpStatus.OK).build();
     }
 
     @Override
